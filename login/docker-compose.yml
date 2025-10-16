@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    image: madeinportugal-login:latest
+    container_name: madeinportugal_login
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: python src/main.py
+    restart: unless-stopped
