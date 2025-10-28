@@ -1,5 +1,0 @@
-flask
-flask-login
-requests_oauthlib
-requests
-cryptography
