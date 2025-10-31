@@ -1,5 +1,10 @@
 -- Drop existing Tables (safe reset)
 DROP TABLE IF EXISTS award CASCADE;
+DROP TABLE IF EXISTS review CASCADE;
+DROP TABLE IF EXISTS used_points CASCADE;
+DROP TABLE IF EXISTS loyalty CASCADE;
+DROP TABLE IF EXISTS products CASCADE;
+DROP TYPE IF EXISTS AWARD_TYPE;
 
 -- Create Enums
 CREATE TYPE AWARD_TYPE AS ENUM('best', 'most_sold', 'revelation');
@@ -25,6 +30,15 @@ CREATE TABLE used_points (
     id SERIAL PRIMARY KEY,
     order_id INTEGER NOT NULL,
     points INTEGER NOT NULL
+);
+
+CREATE TABLE products (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  rank INTEGER NOT NULL,
+  description TEXT,
+  image_url TEXT
 );
 
 CREATE TABLE loyalty (

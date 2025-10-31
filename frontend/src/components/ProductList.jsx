@@ -35,7 +35,7 @@ export default function ProductList() {
         {products.length === 0 && !loading && <li>No products loaded</li>}
         {products.map(p => (
           <li key={p.id}>
-            {p.name} — €{p.price}
+            {p.name} — €{p.price} | Rank: {p.rank}
           </li>
         ))}
       </ul>
