@@ -52,6 +52,8 @@ t03g03
 │   ├── Dockerfile
 │   ├── package.json
 │   ├── package-lock.json
+│   ├── public
+│   │   └── index.html
 │   ├── src
 │   │   ├── controllers
 │   │   │   └── productController.js
@@ -70,7 +72,6 @@ t03g03
 │   ├── index.html
 │   ├── package.json
 │   ├── package-lock.json
-│   ├── README.md
 │   ├── src
 │   │   ├── api.js
 │   │   ├── App.css
@@ -115,6 +116,11 @@ Root:
 ## How to run
 
 The app can be run either in development mode (all the changes will take effect immediately) or in production mode with each service in its container.
+
+**<ins>IMPORTANT<ins>**: Must set `DB_HOST` in `.env` file:
+
+- `db` if in production mode
+- `localhost` if in development mode
 
 ### Prerequisites
 
@@ -173,13 +179,13 @@ docker run --name postgres_local \
 Create the Database:
 
 ```bash
-docker exec -i postgres_local psql -U postgres -d madeinportugal < db/mip-s_schema.sql
+docker exec -i postgres_local psql -U postgres -d madeinportugal < app/db/mip-s_schema.sql
 ```
 
 Populate the Database:
 
 ```bash
-docker exec -i postgres_local psql -U postgres -d madeinportugal < db/populate.sql
+docker exec -i postgres_local psql -U postgres -d madeinportugal < app/db/populate.sql
 ```
 
 **If needed** Verify tables and data:
@@ -220,5 +226,6 @@ The app can be accessed at <http://localhost:5173>.
 
 - Implement more frontend pages in `frontend/src`.
 - Add new API routes in `backend/src/routes`.
+- Use Docker Compose to run locally with the same environment as the server.
 
 **Good luck coding!**
