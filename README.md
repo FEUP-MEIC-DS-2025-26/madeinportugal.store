@@ -135,88 +135,33 @@ cd t03g03
 
 ### Run in Production mode
 
+Start the containers in production mode:
+
 ```bash
 ./start.sh
 ```
 
 This sets the docker containers up and runs the app. This does **not** auto-restart on code changes - must build again to see changes.
 
+Stop and remove the containers:
+
+```bash
+docker compose down --rmi all -v
+```
+
 ### Run in Development mode
 
-#### 1. Install Node.js and React Dependencies
-
-From root, go to backend folder and install:
+Start the app in development mode with:
 
 ```bash
-cd backend
-npm install
+./start-dev.sh
 ```
 
-From root, go to frontend folder and install:
+Stop the app with:
 
 ```bash
-cd frontend
-npm install
+./stop-dev.sh
 ```
-
-#### 2. Setup environment variables
-
-```bash
-cp .env.dev backend/.env
-cp .env.dev frontend/.env
-```
-
-#### 3. Start PostgreSQL Database
-
-Start a PostgreSQL container on port `5432`:
-
-```bash
-docker run --name postgres_local \
-  -e POSTGRES_PASSWORD=1234 \
-  -e POSTGRES_DB=madeinportugal \
-  -p 5432:5432 \
-  -d postgres:18
-```
-
-Create the Database:
-
-```bash
-docker exec -i postgres_local psql -U postgres -d madeinportugal < db/mip-s_schema.sql
-```
-
-Populate the Database:
-
-```bash
-docker exec -i postgres_local psql -U postgres -d madeinportugal < db/populate.sql
-```
-
-**If needed** Verify tables and data:
-
-```bash
-docker exec -it postgres_local psql -U postgres -d madeinportugal
-```
-
-#### 4. Start the Backend Locally
-
-From root folder:
-
-```bash
-cd backend
-npm run dev
-```
-
-- Starts the backend with `nodemon` on `http://localhost:3000`.
-
-#### 5. Start the Frontend Locally
-
-From root folder:
-
-```bash
-cd frontend
-npm run dev
-```
-
-- Starts the frontend on <http://localhost:5173>.
 
 ## Access the App
 
