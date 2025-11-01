@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:18
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: madeinportugal
+    volumes:
+      - mips_db:/var/lib/postgresql
+      - ./app/db:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "5432:5432"
+    restart: always
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=1234
+      - DB_NAME=madeinportugal
+      - NODE_ENV=production
+    depends_on:
+      - db
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - app
+    restart: always
+
+volumes:
+  mips_db:
+
+networks:
+  default:
+    driver: bridge
