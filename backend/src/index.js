@@ -11,8 +11,8 @@ const PORT = process.env.BE_PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Allow Frontend requests
-app.use(cors({ origin: `http://${process.env.FE_HOST}:${process.env.FE_PORT}` }));
+// Allow CORS requests
+app.use(cors());
 
 // Routes
 app.use('/api/products', productRoutes);
