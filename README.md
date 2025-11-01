@@ -33,23 +33,49 @@ madeinportugal-store/
 │   │   └── populate.sql
 │   ├── public/
 │   │   ├── index.html
-│   │   ├── css/
-│   │   │   └── style.css
-│   │   └── js/
 │   ├── .env
-│   └── package.json
+│   ├── package.json
+│   ├── package.lock.json
+│   ├── Dockerfile
+│   └── start.sh
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   └── api.js
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── package.json
+│   ├── package.lock.json
+│   ├── Dockerfile
+│   └── start.sh
 ├── nginx/
 │   └── default.conf
-└── docker-compose.yml
+├── docker-compose.yml
+└── start.sh
 ```
 
-* `app/` → Node.js backend
-* `app/public/` → Frontend files (HTML/CSS/JS)
-* `app/routes/` → Express API routes
-* `app/.env` → environment variables
-* `app/package.json` → Node.js dependencies and scripts
-* `nginx/` → Nginx configuration
-* `docker-compose.yml` → Docker services configuration
+Backend:
+  * `app/` → Node.js backend
+  * `app/routes/` → Express API routes
+  * `app/.env` → environment variables
+  * `app/package.json` → Node.js dependencies and scripts
+
+Frontend:
+  * `frontend/` → React backend
+  * `frontend/public/` → Production frontend files
+  * `frontend/src/` → Frontend source code
+  * `frontend/package.json` → React and Vite dependencies and scripts
+  * `frontend/index.html` → Frontend development phase HTML file
+  * `frontend/vite.config.js` → Vite configuration file
+  * `frontend/Dockerfile` → Frontend docker image dockerfile
+  * `frontend/start.sh` → Frontend docker image shell file
+
+Root:
+  * `docker-compose.yml` → Docker services configuration
+  * `nginx/` → Nginx configuration
+  * `start.sh` → Shell file that builds the production environment and Docker containers
 
 ---
 
@@ -86,16 +112,16 @@ npm install
 docker run --name postgres_local \
   -e POSTGRES_PASSWORD=1234 \
   -e POSTGRES_DB=madeinportugal \
-  -p 5433:5432 \
+  -p 5432:5432 \
   -d postgres:18
 ```
 
-* This starts a local PostgreSQL container on port `5433`.
+* This starts a local PostgreSQL container on port `5432`.
 
 
 ---
 
-## **4. Create and Populate the Database**
+## **4. Create and Populate the Database (development phase)**
 
 1. **Go to backend folder:**
 
@@ -106,13 +132,13 @@ cd app
 2. **Run the schema SQL file:**
 
 ```bash
-docker exec -i postgres_local psql -U postgres -d madeinportugal < db/mip-s_schema.sql
+docker exec -i postgres_local psql -U postgres -d madeinportugal < app/db/mip-s_schema.sql
 ```
 
 3. **Run the populate SQL file:**
 
 ```bash
-docker exec -i postgres_local psql -U postgres -d madeinportugal < db/populate.sql
+docker exec -i postgres_local psql -U postgres -d madeinportugal < app/db/populate.sql
 ```
 
 4. **(If needed) Verify tables and data:**
@@ -124,6 +150,8 @@ docker exec -it postgres_local psql -U postgres -d madeinportugal
 ---
 
 ## **5. Start the Backend Locally**
+
+**<ins>IMPORTANT<ins>**: Must set `DB_HOST` in `.env` file to `localhost`.
 
 From root folder:
 
@@ -151,31 +179,26 @@ npm run dev
 
 ---
 
-## **7. Access the App (Dev mode)**
+## **7. Access the App (Dev phase)**
 
 * Frontend: `http://localhost:5173`.
 
 ---
 
-## **8. Test in Production mode**
+## **8. Test in Production phase**
 
-Go to frontend folder and build:
+**<ins>IMPORTANT<ins>**: Must set `DB_HOST` in `.env` file to `db`.
 
-```bash
-cd frontend
-npm run build
-```
-
-* This builds the project and places it in `app/public`.
-
-Then, in backend folder:
+From root folder, simply run:
 
 ```bash
-cd app
-npm start
+./start.sh
 ```
 
-* Check production at `http://localhost:3000`.
+This will build and run the containers (frontend, backend and db).
+
+* Check production frontend at `http://localhost:5173`.
+* Verify that production backend is running at `http://localhost:3000`.
 * Does **not** auto-restart on code changes. Must build again to see changes.
 
 ---

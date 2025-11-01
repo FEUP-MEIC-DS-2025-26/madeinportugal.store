@@ -23,7 +23,7 @@ export default function ProductList() {
   return (
     <section>
       <h1>🇵🇹 Made in Portugal Store</h1>
-      <p>Welcome! Your Node.js + PostgreSQL setup is working!</p>
+      <p>Welcome! Your Node.js + PostgreSQL + React setup is working!</p>
 
       <button onClick={loadProducts} disabled={loading}>
         {loading ? 'Loading…' : 'Show Products'}
