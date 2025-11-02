@@ -17,7 +17,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: europe-west1-docker.pkg.dev/madeinportugal-store/madeinportugal-store/backend:latest
     ports:
       - "3000:3000"
     environment:
@@ -35,7 +34,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    image: europe-west1-docker.pkg.dev/madeinportugal-store/madeinportugal-store/frontend:latest
     ports:
       - "5173:5173"
     depends_on:
