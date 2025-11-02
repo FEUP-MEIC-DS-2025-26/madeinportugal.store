@@ -21,6 +21,7 @@ CREATE TABLE award (
 CREATE TABLE review (
     id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL,
+    customer_id INTEGER NOT NULL,
     rating NUMERIC(1, 0) NOT NULL CHECK(rating >= 1) CHECK(rating <=5),
     comment TEXT DEFAULT NULL,
     created TIMESTAMP NOT NULL DEFAULT NOW()

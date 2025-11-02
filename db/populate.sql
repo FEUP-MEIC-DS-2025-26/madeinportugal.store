@@ -7,12 +7,12 @@ INSERT INTO award (year, award_type, product_id, category_id) VALUES
   (2021, 'most_sold',  105, 4);
 
 -- Sample data for review
-INSERT INTO review (product_id, rating, comment, created) VALUES
-  (101, 5, 'Outstanding quality — exceeded expectations.', '2024-06-12 10:15:00'),
-  (101, 4, 'Very good, minor packaging issue.',            '2024-07-01 09:00:00'),
-  (102, 3, 'Average performance for the price.',           '2024-08-20 14:30:00'),
-  (103, 5, 'Surprising performance — real revelation!',     '2022-11-05 08:45:00'),
-  (104, 2, 'Not what I expected.',                         '2024-01-10 18:20:00');
+INSERT INTO review (product_id, customer_id, rating, comment, created) VALUES
+  (101, 201, 5, 'Outstanding quality — exceeded expectations.', '2024-06-12 10:15:00'),
+  (101, 202, 4, 'Very good, minor packaging issue.',            '2024-07-01 09:00:00'),
+  (102, 203, 3, 'Average performance for the price.',           '2024-08-20 14:30:00'),
+  (103, 204, 5, 'Surprising performance — real revelation!',     '2022-11-05 08:45:00'),
+  (104, 205, 2, 'Not what I expected.',                         '2024-01-10 18:20:00');
 
 -- Sample data for used_points
 INSERT INTO used_points (order_id, points) VALUES
