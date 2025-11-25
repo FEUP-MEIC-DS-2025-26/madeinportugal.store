@@ -21,6 +21,8 @@ password = ""
 
 # start session
 browser = webdriver.Chrome()
+browser.set_window_position(0, 0)
+browser.set_window_size(1024, 768)
 
 def authenticate(): 
     browser.get(login_page)
@@ -64,6 +66,12 @@ def navigate():
     perform_image_search()
     go_to_landing_page()
     time.sleep(10)
+
+    # Suggest a product and inventory accept
+    test_product_suggestion_page()
+    test_inventory_dashboard()
+    go_to_landing_page()
+    time.sleep(5)
 
     # quit
     browser.quit()
@@ -124,6 +132,96 @@ def perform_image_search():
         print("Could not send PAGE_DOWN to number input; continuing")
 
     time.sleep(20)
+
+def test_product_suggestion_page():
+    page_links = browser.find_elements(By.CSS_SELECTOR, "a")
+    for link in page_links:
+        if link.text == "Seller Dashboard":
+            link.click()
+            break
+
+    wait = WebDriverWait(browser, 10)
+    wait.until(lambda d: any(b.text == "Suggest a product"
+                            for b in d.find_elements(By.CSS_SELECTOR, ".action-content h3")))
+
+
+    browser.implicitly_wait(0.5)
+
+    dashboard_actions = browser.find_elements(By.CSS_SELECTOR, ".action-content h3")
+    for content in dashboard_actions:
+        if content.text == "Suggest a product":
+            content.click()
+            break
+
+    original_window = browser.current_window_handle
+
+    wait.until(EC.number_of_windows_to_be(2))
+
+    for window_handle in browser.window_handles:
+        if window_handle != original_window:
+            browser.switch_to.window(window_handle)
+            break
+
+    wait.until(EC.title_is("Product Submission"))
+
+    time.sleep(2)
+
+    product_name = browser.find_element(By.ID, "name")
+
+    product_name.send_keys("Queijinho da Serra")
+
+    time.sleep(1)
+
+    wait.until(lambda d: any(b.text == "Accept"
+                            for b in d.find_elements(By.CSS_SELECTOR, "button")))
+
+    browser.implicitly_wait(10)
+
+    buttons = browser.find_elements(By.CSS_SELECTOR, "button")
+    for button in buttons:
+        if button.text == "Accept":
+            button.click()
+            time.sleep(0.5)
+
+    time.sleep(2)
+
+    buttons = browser.find_elements(By.CSS_SELECTOR, "button")
+    for button in buttons:
+        if button.text == "Submit Product Suggestion":
+            button.click()
+            break
+        
+    time.sleep(5)
+
+def test_inventory_dashboard():
+    # TODO(Process-ing): Access from landing page, once the link is available
+    browser.get("https://mips-product-configuration-oqwis3m3oa-no.a.run.app/manage/submissions")
+
+    wait = WebDriverWait(browser, 5)
+    wait.until(lambda d: any(b.text == "Approve"
+                         for b in d.find_elements(By.CSS_SELECTOR, "button")))
+    time.sleep(1)
+
+    buttons = browser.find_elements(By.CSS_SELECTOR, "button")
+    for button in buttons:
+        if button.text == "Approve":
+            button.click()
+            break
+
+    wait = WebDriverWait(browser, 2)
+    wait.until(lambda d: any(b.text == "Approve Submission?"
+                         for b in d.find_elements(By.CSS_SELECTOR, "h2")))
+    time.sleep(1)
+
+    buttons = browser.find_elements(By.CSS_SELECTOR, "button")
+    for button in buttons[::-1]:
+        if button.text == "Approve":
+            button.click()
+            break
+
+    wait.until(lambda d: any("Submission Approved" in b.text
+                         for b in d.find_elements(By.CSS_SELECTOR, "div")))
+    time.sleep(2)
 
 def go_to_landing_page():
     browser.get(landing_page)
