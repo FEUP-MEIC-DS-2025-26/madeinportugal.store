@@ -81,6 +81,11 @@ def navigate():
     go_to_landing_page()
     time.sleep(5)
 
+    # Spam Moderation flow
+    run_moderator_flow()
+    go_to_landing_page()
+    time.sleep(5)
+
     # quit
     browser.quit()
 
@@ -230,6 +235,54 @@ def test_inventory_dashboard():
     wait.until(lambda d: any("Submission Approved" in b.text
                          for b in d.find_elements(By.CSS_SELECTOR, "div")))
     time.sleep(2)
+
+def run_moderator_flow():
+    # Open user menu -> Admin
+    original_window = browser.current_window_handle
+    wait = WebDriverWait(browser, 20)
+    try:
+        user_menu = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[@aria-label='Open user menu']")
+        ))
+        browser.execute_script("arguments[0].click();", user_menu)
+        time.sleep(1)
+
+        admin_opt = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//a[contains(text(),'Admin')]")
+        ))
+        browser.execute_script("arguments[0].click();", admin_opt)
+
+        # Switch to new tab
+        wait.until(lambda d: len(d.window_handles) > 1)
+        browser.switch_to.window(browser.window_handles[-1])
+        print("[BOT] Admin page opened.")
+        time.sleep(2)
+
+        check_all = wait.until(EC.element_to_be_clickable((By.ID, "analyzeAll")))
+        browser.execute_script("arguments[0].click();", check_all)
+        print("[BOT] Waiting for analysis...")
+        time.sleep(5)
+
+
+        try:
+            WebDriverWait(browser, 60).until(EC.alert_is_present())
+            alert = browser.switch_to.alert
+            print(f"[BOT] Alert: {alert.text}")
+            alert.accept()
+        except TimeoutException:
+            print("[BOT] No alert appeared within timeout.")
+
+    except Exception as e:
+        print(f"[BOT] Admin flow error: {e}")
+    finally:
+        # Close admin tab if opened and return to original window
+        try:
+            if browser.current_window_handle != original_window:
+                browser.close()
+                browser.switch_to.window(original_window)
+        except Exception:
+            pass
+        time.sleep(2)
 
 def go_to_landing_page():
     browser.get(landing_page)
