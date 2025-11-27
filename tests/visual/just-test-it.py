@@ -261,8 +261,6 @@ def run_moderator_flow():
         check_all = wait.until(EC.element_to_be_clickable((By.ID, "analyzeAll")))
         browser.execute_script("arguments[0].click();", check_all)
         print("[BOT] Waiting for analysis...")
-        time.sleep(5)
-
 
         try:
             WebDriverWait(browser, 60).until(EC.alert_is_present())
@@ -282,7 +280,6 @@ def run_moderator_flow():
                 browser.switch_to.window(original_window)
         except Exception:
             pass
-        time.sleep(2)
 
 def go_to_landing_page():
     browser.get(landing_page)
