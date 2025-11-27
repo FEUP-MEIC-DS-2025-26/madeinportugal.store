@@ -16,8 +16,8 @@ login_page = ''
 federatedLogin = ''
 
 # credentials
-username = ""
-password = ""
+username = "user"
+password = "pass"
 
 # start session
 browser = webdriver.Chrome()
@@ -25,38 +25,46 @@ browser.set_window_position(0, 0)
 browser.set_window_size(1024, 768)
 
 def authenticate(): 
-    browser.get(login_page)
+    """Login via landing page using the username/password variables."""
+    wait = WebDriverWait(browser, 20)
 
-    # Wait for the login page to load (adjust the timeout as needed)
-    wait = WebDriverWait(browser, 30)
-    wait.until(EC.title_contains("Entering the website"))
+    # Ensure landing page is open
+    try:
+        if "madeinportugal.store" not in browser.current_url:
+            browser.get(landing_page)
+            time.sleep(1)
+    except Exception:
+        browser.get(landing_page)
+        time.sleep(1)
 
-    print(browser.current_url)
+    # Click Login
+    login_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Login')]")))
+    browser.execute_script("arguments[0].click();", login_btn)
+    time.sleep(1)
 
-    # navigate to Web Login Service
-    browser.get(federatedLogin)
-    wait.until(EC.title_contains("Web Login Service"))
-    print(browser.current_url)
-    time.sleep(2)
+    if not username or not password:
+        raise ValueError("Set 'username' and 'password' variables at the top of just-test-it.py")
 
-    # Enter the credentials
-    username_field = browser.find_element(By.ID, "username")
-    password_field = browser.find_element(By.ID, "password")
-    username_field.send_keys(username)
-    # password = getpass.getpass('Password:')
-    password_field.send_keys(password)
+    # Fill credentials
+    user_input = wait.until(EC.presence_of_element_located((By.XPATH, "//form//input[1]")))
+    user_input.clear()
+    user_input.send_keys(username)
 
-    # Submit the form
-    password_field.send_keys(Keys.RETURN)
+    pass_input = wait.until(EC.presence_of_element_located((By.XPATH, "//form//input[2]")))
+    pass_input.clear()
+    pass_input.send_keys(password)
 
-    # Now you're logged in!
+    # Submit
+    submit_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//form//button[@type='submit']")))
+    browser.execute_script("arguments[0].click();", submit_btn)
     print("Logging in...")
-    time.sleep(2)
+    time.sleep(3)
 
 
 def navigate():
     # let's do the login
-    # authenticate()
+    browser.get(landing_page)
+    authenticate()
 
     # navigate to landing page
     browser.get(landing_page)
