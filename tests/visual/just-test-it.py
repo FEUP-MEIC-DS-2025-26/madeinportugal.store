@@ -87,6 +87,11 @@ def navigate():
     go_to_landing_page()
     time.sleep(5)
 
+    #Tracking status
+    test_tracking_status()
+    go_to_landing_page()
+    time.sleep(5)
+
     # quit
     browser.quit()
 
@@ -311,6 +316,109 @@ def run_moderator_flow():
                 browser.switch_to.window(original_window)
         except Exception:
             pass
+    
+def test_tracking_status():
+
+    #Enter the orders page from the landing page
+    wait = WebDriverWait(browser, 30)
+    button = browser.find_element(By.XPATH, "//button[@aria-label='Open user menu']")
+    button.click()
+    links = browser.find_elements(By.CSS_SELECTOR, "a")
+    for link in links:
+        if link.text == "My Orders":
+            link.click()
+            break
+    
+    tabs = browser.window_handles
+    # Switch to the new tab (last one in the list)
+    browser.close()
+    browser.switch_to.window(tabs[-1])
+    
+    wait.until(lambda d: any("Orders" in b.text.strip() for b in d.find_elements(By.CSS_SELECTOR, "h1")))
+
+
+    #Click on the first order
+    time.sleep(5)
+    button = browser.find_element(By.ID, "order-1")
+    button.click()
+
+    wait.until(lambda d: any("Order 1" in b.text.strip() for b in d.find_elements(By.CSS_SELECTOR, "h1")))
+
+    #Sleep for a few seconds to load the page
+    time.sleep(5)
+
+    #Focus on the carbon footprint and click on it
+    element = browser.find_element(By.ID, "carb-button")
+    browser.execute_script("arguments[0].scrollIntoView();", element)
+    time.sleep(1)
+    element.click()
+    
+    #Some sleep to show the element
+    time.sleep(5)
+
+    #Click on the verification button
+    element = browser.find_element(By.ID, "verification")
+    browser.execute_script("arguments[0].scrollIntoView();", element)
+    time.sleep(1)
+    element.click()
+    wait.until(
+    EC.element_to_be_clickable((By.ID, "verification")))
+    time.sleep(5)
+
+    #Go to the first link and click on it
+    element = browser.find_element(By.ID, "link-0")
+    browser.execute_script("arguments[0].scrollIntoView();", element)
+    time.sleep(1)
+    element.click()
+    time.sleep(8)
+    tabs = browser.window_handles
+    # Switch to the new tab (last one in the list)
+    browser.switch_to.window(tabs[-1])
+    browser.close()
+    browser.switch_to.window(tabs[0])
+    browser.back()
+
+
+    #Click on the second order
+    time.sleep(5)
+    button = browser.find_element(By.ID, "order-2")
+    button.click()
+
+    wait.until(lambda d: any("Order 2" in b.text.strip() for b in d.find_elements(By.CSS_SELECTOR, "h1")))
+
+    time.sleep(5)
+
+    #Focus on the update button
+    element = browser.find_element(By.ID, "update")
+    browser.execute_script("arguments[0].scrollIntoView();", element)
+    time.sleep(1)
+    element.click()
+
+    #Some sleep to show the element
+    time.sleep(2)
+
+    #Enter a new address
+    element = browser.find_element(By.ID, "delivery-address")
+    element.send_keys("Rua Dr. Roberto Frias, Porto, 4200-465 PORTO")
+    time.sleep(1)
+
+    #Click on the update button
+    element = browser.find_element(By.ID, "send-update")
+    element.click()
+
+    #Click cancel to exit the modal
+    element = wait.until(
+    EC.element_to_be_clickable((By.ID, "cancel-update")))
+    time.sleep(2)
+    element.click()
+    time.sleep(2)
+
+    #Show the updated info
+    browser.execute_script("window.scrollTo(0, 0);")
+    time.sleep(8)
+
+
+    return
 
 def go_to_landing_page():
     browser.get(landing_page)
