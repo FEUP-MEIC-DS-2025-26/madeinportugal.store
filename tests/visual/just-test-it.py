@@ -71,9 +71,10 @@ def navigate():
     # retrieve_menu_items_related_with_products()
     go_to_landing_page()
     click_image_search_btn()
-    perform_image_search()
+    perform_image_search_by_image()
+    perform_image_search_by_text()
     go_to_landing_page()
-    time.sleep(10)
+    time.sleep(5)
 
     # Suggest a product and inventory accept
     test_product_suggestion_page()
@@ -106,7 +107,7 @@ def click_image_search_btn():
     time.sleep(2)  
     
     
-def perform_image_search():
+def perform_image_search_by_image():
     file_input = WebDriverWait(browser, 10).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
     )
@@ -143,8 +144,38 @@ def perform_image_search():
         results_input.send_keys(Keys.PAGE_DOWN)
     except Exception:
         print("Could not send PAGE_DOWN to number input; continuing")
+    time.sleep(2)
+    
+def perform_image_search_by_text():
+    wait = WebDriverWait(browser, 10)
 
-    time.sleep(20)
+    text_tab = wait.until(
+        EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Search by Text']"))
+    )
+    browser.execute_script("arguments[0].click();", text_tab)
+    time.sleep(1)
+
+    textarea = wait.until(EC.presence_of_element_located((By.TAG_NAME, "textarea")))
+    textarea.clear()
+    textarea.send_keys("apple")
+
+    search_button = wait.until(
+        EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Search']"))
+    )
+    search_button.click()
+    print("Searching by text for 'apple'...")
+
+    try:
+        wait.until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "div.grid img"))
+        )
+        print("Text search results detected.")
+    except Exception:
+        print("No text search results detected before timeout.")
+
+    browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(2)
+
 
 def test_product_suggestion_page():
     page_links = browser.find_elements(By.CSS_SELECTOR, "a")
