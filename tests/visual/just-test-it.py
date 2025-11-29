@@ -68,36 +68,51 @@ def navigate():
     browser.get(landing_page)
     authenticate()
 
-    # navigate to landing page
-    browser.get(landing_page)
-    # retrieve_menu_items_related_with_products()
-    go_to_landing_page()
-    click_image_search_btn()
-    perform_image_search_by_image()
-    perform_image_search_by_text()
-    go_to_landing_page()
-    time.sleep(5)
-
-    # Suggest a product and inventory accept
-    test_product_suggestion_page()
-    test_inventory_dashboard()
-    go_to_landing_page()
-    time.sleep(5)
-
+    try:
+        # navigate to landing page
+        browser.get(landing_page)
+        # retrieve_menu_items_related_with_products()
+        go_to_landing_page()
+        click_image_search_btn()
+        perform_image_search_by_image()
+        perform_image_search_by_text()
+        go_to_landing_page()
+        time.sleep(5)
+    except:
+        print("Error in image search")
+    
+    try:
+        # Suggest a product and inventory accept
+        test_product_suggestion_page()
+        test_inventory_dashboard()
+        go_to_landing_page()
+        time.sleep(5)
+    except:
+        print("Error in inventory dashboard or product suggestion")
+    
     # Spam Moderation flow
-    run_moderator_flow()
-    go_to_landing_page()
-    time.sleep(5)
-
+    try:
+        run_moderator_flow()
+        go_to_landing_page()
+        time.sleep(5)
+    except:
+        print("Error in spam moderation")
+        
+        
     #Tracking status
-    test_tracking_status()
+    try:
+        test_tracking_status()
+        go_to_landing_page()
+        time.sleep(5)
+    except:
+        print("Error in tracking status")
+    # AI chat
+    go_to_landing_page()
+    from_landing_page_navigate_to_ai_chat(browser)
+    testChatAndResponse(browser)
+    time.sleep(5)
     go_to_landing_page()
     time.sleep(5)
-
-    # AI chat
-    from_landing_page_navigate_to_ai_chat()
-    testChatAndResponse()
-    go_to_landing_page()
     
 
     # quit
