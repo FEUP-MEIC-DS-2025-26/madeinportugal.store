@@ -24,6 +24,8 @@ browser = webdriver.Chrome()
 browser.set_window_position(0, 0)
 browser.set_window_size(1024, 768)
 
+from test_ai_chat import *
+
 def authenticate(): 
     """Login via landing page using the username/password variables."""
     wait = WebDriverWait(browser, 20)
@@ -91,6 +93,12 @@ def navigate():
     test_tracking_status()
     go_to_landing_page()
     time.sleep(5)
+
+    # AI chat
+    from_landing_page_navigate_to_ai_chat()
+    testChatAndResponse()
+    go_to_landing_page()
+    
 
     # quit
     browser.quit()
