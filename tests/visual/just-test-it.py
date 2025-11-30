@@ -130,6 +130,15 @@ def navigate():
     time.sleep(5)
     go_to_landing_page()
     time.sleep(5)
+
+    # Wishlist feature
+    from test_wishlist import test_wishlist_feature
+    try:
+        test_wishlist_feature(browser)
+        go_to_landing_page()
+        time.sleep(5)
+    except Exception as e:
+        print(f"Error in wishlist feature: {e}")
     
 
     # quit
