@@ -63,16 +63,18 @@ def authenticate():
 
 
 def navigate():
-    # let's do the login
     browser.get(landing_page)
     time.sleep(1)
+
     authenticate()
+
     scroll_to_recommended_products()
     check_recommended_products()
+    click_recommended_reason()
     click_recommendations_seemore()
+
     time.sleep(20)
 
-    # quit
     browser.quit()
 
 def scroll_to_recommended_products():
@@ -87,15 +89,23 @@ def scroll_to_recommended_products():
 
 def check_recommended_products():
     next_button = browser.find_element(By.XPATH, "//section[@id='recommended']//button[@id='rec-next-button']")
-    for i in range(5):
+    for _ in range(5):
         next_button.click()
         time.sleep(1)
     time.sleep(2)
     
+def click_recommended_reason():
+    rec_reason_button = browser.find_element(
+        By.XPATH, 
+        "//section[@id='recommended']//*[@id='rec-carousel-frame']/*[4]//*[@id='rec-reason']"
+    )
+    rec_reason_button.click()
+    time.sleep(5)
+
 def click_recommendations_seemore():
     seemore_button = browser.find_element(By.XPATH, "//section[@id='recommended']//button[@id='rec-see-more-button']")
     seemore_button.click()
-    time.sleep(8)
+    time.sleep(16)
     
     browser.execute_script(
         "window.scrollTo(0, document.body.scrollHeight);"
