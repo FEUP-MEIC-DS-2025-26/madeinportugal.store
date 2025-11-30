@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
 # from bs4 import BeautifulSoup
 import getpass
 import time
@@ -12,6 +13,7 @@ import os
 
 # urls to use
 landing_page = 'https://madeinportugal.store'
+host_MIPS_Frontend = 'https://microfrontend-host-1054126107932.europe-west1.run.app'
 login_page = ''
 federatedLogin = ''
 
@@ -62,6 +64,21 @@ def authenticate():
     print("Logging in...")
     time.sleep(3)
 
+def authenticate_host(): 
+    """Login via landing page using the username/password variables."""
+    wait = WebDriverWait(browser, 20)
+
+    # Ensure landing page is open
+    try:
+        if "microfrontend-host" not in browser.current_url:
+            browser.get(host_MIPS_Frontend)
+            time.sleep(1)
+    except Exception:
+        browser.get(host_MIPS_Frontend)
+        time.sleep(1)
+
+    print("Logging in...")
+    time.sleep(5)
 
 def navigate():
     # let's do the login
@@ -116,7 +133,28 @@ def navigate():
     
 
     # quit
-    browser.quit()
+    #browser.quit()
+
+def navigate_host():
+    # let's do the login
+    browser.get(host_MIPS_Frontend)
+    authenticate_host()
+
+    # Test leaderboards
+    print("Test-leaderboards start:")
+    try:
+        go_to_host_frontend()
+        #click_button('Product Leaderboards Page') Uncomment when available in host
+        scroll_down()
+        scroll_up()
+        #switch_leaderboard_category() Uncomment when available in host
+        go_to_host_frontend()
+        time.sleep(5)
+    except:
+        print("Error while testing leaderboards")
+
+    # quit
+    #browser.quit()
 
 
 def retrieve_menu_items_related_with_products():
@@ -446,5 +484,62 @@ def test_tracking_status():
 def go_to_landing_page():
     browser.get(landing_page)
     time.sleep(2)
+
+# ===
+
+def click_button(button_name):
+    print(f"Clicking button {button_name}...")
+    button = WebDriverWait(browser, 10).until(
+        EC.element_to_be_clickable((By.XPATH, f"//a[normalize-space()='{button_name}'] | //button[normalize-space()='{button_name}']"))
+    )
+    button.click()
+    time.sleep(3)
     
+def scroll_down():
+    print("Scrolling down...")
+    browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(2)
+
+def scroll_up():
+    print("Scrolling up...")
+    browser.execute_script("window.scrollTo(0, 0);")
+    time.sleep(2)
+
+def switch_leaderboard_category(next_index = None):
+    print("Changing leaderboard category...")
+    try:
+        sel_el = WebDriverWait(browser, 5).until(
+            EC.presence_of_element_located((By.ID, "leaderboard-select"))
+        )
+        sel = Select(sel_el)
+        opts = sel.options
+        if not opts:
+            print("No options in select.")
+            return
+
+        if next_index is None:
+            current_val = sel_el.get_attribute("value")
+            current_idx = next((i for i,o in enumerate(opts) if o.get_attribute("value") == current_val), 0)
+            target = current_idx + 1 if current_idx + 1 < len(opts) else 0
+        else:
+            target = max(0, min(next_index, len(opts) - 1))
+
+        print(f"selecting option #{target} -> {opts[target].text}")
+        sel.select_by_index(target)
+        time.sleep(3)
+    except Exception as e:
+        print("switch_leaderboard_category failed:", e)
+
+def go_to_host_frontend():
+    print("Returning to home page...")
+    browser.get(host_MIPS_Frontend)
+    time.sleep(2)
+
+
+
 navigate()
+
+navigate_host()
+
+# quit
+browser.quit()
