@@ -10,7 +10,6 @@ import time
 import os
 # import re
 
-
 # urls to use
 landing_page = 'https://madeinportugal.store'
 host_MIPS_Frontend = 'https://microfrontend-host-1054126107932.europe-west1.run.app'
@@ -174,6 +173,14 @@ def navigate_host():
         go_to_host_frontend()
     except:
         print("Error while testing reviews")
+
+    # this is also applicable for a product section, if it exists in the future it should be moved
+    print("Test-certicate-management Service")
+    try:
+        test_certificate_service()
+        go_to_landing_page()
+    except:
+        print("Error while testing certificate management")
 
     # quit
     #browser.quit()
@@ -862,6 +869,11 @@ def show_landing_page():
     #         pass
     
     return True
+
+from test_certificate_service import *
+def test_certificate_service():
+    run_certificate_demo(browser)
+
 
 show_landing_page()
 
