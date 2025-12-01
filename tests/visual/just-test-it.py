@@ -248,6 +248,17 @@ def navigate_host():
     except:
         print("Error while testing leaderboards")
 
+    # Test Bundle Suggestions
+    print("Test-bundle-suggestions start:")
+    try:
+        go_to_host_frontend()
+        click_button('Bundle Suggestions')
+        not_interest()
+        go_to_host_frontend()
+    except:
+        print("Error while testis bundle suggestions")
+
+
     # Test product-reviews
     print("Test-product-reviews start:")
     try:
@@ -706,6 +717,40 @@ def switch_leaderboard_category(next_index = None):
         time.sleep(3)
     except Exception as e:
         print("switch_leaderboard_category failed:", e)
+
+# Bundle Suggestions
+
+def not_interest():
+    print("Testing 'Not interested' functionality...")
+    wait = WebDriverWait(browser, 10)
+    
+    try:
+        try:
+            first_product = wait.until(EC.presence_of_element_located((By.XPATH, "//h6")))
+            print(f"Current top suggestion: {first_product.text}")
+        except:
+            print("No products visible initially.")
+
+        not_interested_btn = wait.until(
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Not interested')]"))
+        )
+
+        browser.execute_script("arguments[0].click();", not_interested_btn)
+        print("Clicked 'Not interested' button.")
+
+        time.sleep(1)
+        
+        wait.until(EC.visibility_of_element_located((By.XPATH, "//h6")))
+        
+        new_product = browser.find_element(By.XPATH, "//h6")
+        print(f"New top suggestion loaded: {new_product.text}")
+        print("Bundle suggestion refresh successful.")
+
+    except Exception as e:
+        print(f"Error in not_interest test: {e}")
+
+
+
 
 # Product Reviews
 
