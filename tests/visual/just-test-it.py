@@ -101,7 +101,13 @@ def navigate():
     try:
         # Suggest a product and inventory accept
         test_product_suggestion_page()
+        print("Product suggestion submitted.")
         test_inventory_dashboard()
+        print("Inventory dashboard processed.")
+        test_edit_product_page()
+        print("Product edited.")
+        test_inventory_dashboard_edit()
+        print("Product edition rejected.")
         go_to_landing_page()
         time.sleep(5)
     except:
@@ -266,24 +272,17 @@ def perform_image_search_by_text():
 
 
 def test_product_suggestion_page():
+    wait = WebDriverWait(browser, 20)
+    dropdown = browser.find_element(By.CSS_SELECTOR, '[aria-label="Open user menu"]')
+    dropdown.click()
+
     page_links = browser.find_elements(By.CSS_SELECTOR, "a")
     for link in page_links:
         if link.text == "Seller Dashboard":
             link.click()
             break
 
-    wait = WebDriverWait(browser, 10)
-    wait.until(lambda d: any(b.text == "Suggest a product"
-                            for b in d.find_elements(By.CSS_SELECTOR, ".action-content h3")))
-
-
-    browser.implicitly_wait(0.5)
-
-    dashboard_actions = browser.find_elements(By.CSS_SELECTOR, ".action-content h3")
-    for content in dashboard_actions:
-        if content.text == "Suggest a product":
-            content.click()
-            break
+    time.sleep(2)
 
     original_window = browser.current_window_handle
 
@@ -294,9 +293,20 @@ def test_product_suggestion_page():
             browser.switch_to.window(window_handle)
             break
 
-    wait.until(EC.title_is("Product Submission"))
+    wait.until(EC.title_is("Vendor Dashboard"))
 
-    time.sleep(2)
+    wait.until(
+        lambda d: any(
+            "suggest" in b.text.strip().lower()
+            for b in d.find_elements(By.CSS_SELECTOR, ".action-content h3")
+        )
+    )
+
+    dashboard_actions = browser.find_elements(By.CSS_SELECTOR, ".action-content")
+    for content in dashboard_actions:
+        if "suggest" in content.text.strip().lower():
+            content.click()
+            break
 
     product_name = browser.find_element(By.ID, "name")
 
@@ -307,7 +317,7 @@ def test_product_suggestion_page():
     wait.until(lambda d: any(b.text == "Accept"
                             for b in d.find_elements(By.CSS_SELECTOR, "button")))
 
-    browser.implicitly_wait(10)
+    time.sleep(2)
 
     buttons = browser.find_elements(By.CSS_SELECTOR, "button")
     for button in buttons:
@@ -326,9 +336,10 @@ def test_product_suggestion_page():
     time.sleep(5)
 
 def test_inventory_dashboard():
-    # TODO(Process-ing): Access from landing page, once the link is available
-    browser.get("https://mips-product-configuration-oqwis3m3oa-no.a.run.app/manage/submissions")
-
+    # TODO Current Access from Product Suggestion page, change to landing once available
+    inventory = browser.find_element(By.CSS_SELECTOR, '[aria-label="Go to Inventory Manager Dashboard"]')
+    inventory.click()
+    
     wait = WebDriverWait(browser, 5)
     wait.until(lambda d: any(b.text == "Approve"
                          for b in d.find_elements(By.CSS_SELECTOR, "button")))
@@ -350,10 +361,64 @@ def test_inventory_dashboard():
         if button.text == "Approve":
             button.click()
             break
-
     wait.until(lambda d: any("Submission Approved" in b.text
                          for b in d.find_elements(By.CSS_SELECTOR, "div")))
+    time.sleep(3)
+    browser.back()
     time.sleep(2)
+
+def test_edit_product_page():
+    products = browser.find_element(By.CSS_SELECTOR, '[aria-label="View Products"]')
+    products.click()
+    time.sleep(2)
+    link = browser.find_elements(By.CSS_SELECTOR, "a[href$='edit']")[0]
+    link.click()
+
+    time.sleep(2)
+
+    product_name = browser.find_element(By.ID, "name")
+    product_name.send_keys(" Edit")
+
+    time.sleep(2)
+
+    buttons = browser.find_elements(By.CSS_SELECTOR, "button")
+    for button in buttons:
+        if button.text == "Submit Product Suggestion":
+            button.click()
+            break
+
+    time.sleep(5)
+    
+def test_inventory_dashboard_edit():
+    # TODO Current Access from Product Suggestion page, change to landing once available
+    inventory = browser.find_element(By.CSS_SELECTOR, '[aria-label="Go to Inventory Manager Dashboard"]')
+    inventory.click()
+
+    time.sleep(2)
+    button = browser.find_element(By.XPATH, "//button[normalize-space(text())='Edition Suggestions']")
+    button.click()
+
+    time.sleep(2)
+
+    button = browser.find_element(
+        By.XPATH,
+        "//div[@data-slot='card'][.//h3[contains(normalize-space(.), 'Edit')]]//button[normalize-space(text())='Reject']"
+    )
+    button.click()
+
+    time.sleep(2)
+    wait = WebDriverWait(browser, 2)
+    wait.until(lambda d: any(b.text == "Reject Submission?"
+                         for b in d.find_elements(By.CSS_SELECTOR, "h2")))
+    time.sleep(1)
+
+    buttons = browser.find_elements(By.CSS_SELECTOR, "button")
+    for button in buttons[::-1]:
+        if button.text == "Reject":
+            button.click()
+            break
+
+    time.sleep(3)
 
 def run_moderator_flow():
     # Open user menu -> Admin
