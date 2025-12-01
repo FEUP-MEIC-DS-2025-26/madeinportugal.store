@@ -27,7 +27,7 @@ browser.set_window_size(1280, 960)
 
 from test_ai_chat import *
 
-def authenticate(): 
+def authenticate():
     """Login via landing page using the username/password variables."""
     wait = WebDriverWait(browser, 20)
 
@@ -63,7 +63,7 @@ def authenticate():
     print("Logging in...")
     time.sleep(3)
 
-def authenticate_host(): 
+def authenticate_host():
     """Login via landing page using the username/password variables."""
     wait = WebDriverWait(browser, 20)
 
@@ -96,7 +96,7 @@ def navigate():
         time.sleep(5)
     except:
         print("Error in image search")
-    
+
     try:
         # Suggest a product and inventory accept
         test_product_suggestion_page()
@@ -111,7 +111,7 @@ def navigate():
         time.sleep(5)
     except:
         print("Error in inventory dashboard or product suggestion")
-    
+
     # Spam Moderation flow
     try:
         run_moderator_flow()
@@ -119,8 +119,8 @@ def navigate():
         time.sleep(5)
     except:
         print("Error in spam moderation")
-        
-        
+
+
     #Tracking status
     try:
         test_tracking_status()
@@ -144,7 +144,7 @@ def navigate():
         time.sleep(5)
     except Exception as e:
         print(f"Error in wishlist feature: {e}")
-    
+
     # Chat Support
     from test_chat_support import navigate_chat_support
     try:
@@ -173,7 +173,7 @@ def navigate_host():
         go_to_host_frontend()
     except:
         print("Error while testing leaderboards")
-    
+
     # Test product-reviews
     print("Test-product-reviews start:")
     try:
@@ -224,9 +224,9 @@ def click_image_search_btn():
         EC.element_to_be_clickable((By.XPATH, "//a[normalize-space()='Image Search'] | //button[normalize-space()='Image Search']"))
     )
     image_search_button.click()
-    time.sleep(2)  
-    
-    
+    time.sleep(2)
+
+
 def perform_image_search_by_image():
     file_input = WebDriverWait(browser, 10).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
@@ -251,7 +251,7 @@ def perform_image_search_by_image():
     search_button = WebDriverWait(browser, 10).until(
         EC.element_to_be_clickable((By.XPATH, "//button[normalize-space()='Search']"))
     )
-    time.sleep(2) 
+    time.sleep(2)
     search_button.click()
 
     time.sleep(2)
@@ -265,7 +265,7 @@ def perform_image_search_by_image():
     except Exception:
         print("Could not send PAGE_DOWN to number input; continuing")
     time.sleep(2)
-    
+
 def perform_image_search_by_text():
     wait = WebDriverWait(browser, 10)
 
@@ -358,14 +358,13 @@ def test_product_suggestion_page():
         if button.text == "Submit Product Suggestion":
             button.click()
             break
-        
+
     time.sleep(5)
 
 def test_inventory_dashboard():
-    # TODO Current Access from Product Suggestion page, change to landing once available
     inventory = browser.find_element(By.CSS_SELECTOR, '[aria-label="Go to Inventory Manager Dashboard"]')
     inventory.click()
-    
+
     wait = WebDriverWait(browser, 5)
     wait.until(lambda d: any(b.text == "Approve"
                          for b in d.find_elements(By.CSS_SELECTOR, "button")))
@@ -377,7 +376,7 @@ def test_inventory_dashboard():
             button.click()
             break
 
-    wait = WebDriverWait(browser, 2)
+    wait = WebDriverWait(browser, 5)
     wait.until(lambda d: any(b.text == "Approve Submission?"
                          for b in d.find_elements(By.CSS_SELECTOR, "h2")))
     time.sleep(1)
@@ -387,6 +386,10 @@ def test_inventory_dashboard():
         if button.text == "Approve":
             button.click()
             break
+
+    time.sleep(3)
+
+    wait = WebDriverWait(browser, 5)
     wait.until(lambda d: any("Submission Approved" in b.text
                          for b in d.find_elements(By.CSS_SELECTOR, "div")))
     time.sleep(3)
@@ -413,10 +416,13 @@ def test_edit_product_page():
             button.click()
             break
 
-    time.sleep(5)
-    
+    time.sleep(2)
+    browser.back()
+    time.sleep(1)
+    browser.back()
+    time.sleep(2)
+
 def test_inventory_dashboard_edit():
-    # TODO Current Access from Product Suggestion page, change to landing once available
     inventory = browser.find_element(By.CSS_SELECTOR, '[aria-label="Go to Inventory Manager Dashboard"]')
     inventory.click()
 
@@ -490,7 +496,7 @@ def run_moderator_flow():
                 browser.switch_to.window(original_window)
         except Exception:
             pass
-    
+
 def test_tracking_status():
 
     #Enter the orders page from the landing page
@@ -502,12 +508,12 @@ def test_tracking_status():
         if link.text == "My Orders":
             link.click()
             break
-    
+
     tabs = browser.window_handles
     # Switch to the new tab (last one in the list)
     browser.close()
     browser.switch_to.window(tabs[-1])
-    
+
     wait.until(lambda d: any("Orders" in b.text.strip() for b in d.find_elements(By.CSS_SELECTOR, "h1")))
 
 
@@ -526,7 +532,7 @@ def test_tracking_status():
     browser.execute_script("arguments[0].scrollIntoView();", element)
     time.sleep(1)
     element.click()
-    
+
     #Some sleep to show the element
     time.sleep(5)
 
@@ -867,7 +873,7 @@ def click_button(button_name):
     )
     button.click()
     time.sleep(3)
-    
+
 def scroll_down():
     print("Scrolling down...")
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -888,7 +894,7 @@ def scroll_landing_page_slowly():
     Navigate to the landing page and scroll slowly from top to bottom
     """
     print("[+] - 🚀 Starting landing page scroll test...")
-    
+
     # Navigate to landing page
     try:
         browser.get(landing_page)
@@ -902,7 +908,7 @@ def scroll_landing_page_slowly():
     try:
         total_height = browser.execute_script("return Math.max( document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight )")
         viewport_height = browser.execute_script("return window.innerHeight")
-        
+
         print(f"[+] - 📏 Page height: {total_height}px, Viewport height: {viewport_height}px")
     except Exception as e:
         print(f"[+] - ⚠️ Could not get page dimensions: {e}")
@@ -912,38 +918,38 @@ def scroll_landing_page_slowly():
     # Calculate scroll increment (scroll by small chunks)
     scroll_increment = viewport_height // 2  # Scroll by quarter viewport height each time
     current_position = 0
-    
+
     print(f"[+] - 📜 Starting slow scroll (increment: {scroll_increment}px)...")
-    
+
     # Scroll slowly from top to bottom
     while current_position < total_height:
         try:
             # Scroll down by increment
             browser.execute_script(f"window.scrollTo(0, {current_position});")
-            
+
             # Wait between scrolls to simulate slow scrolling
             time.sleep(1.5)  # Adjust this value to make scrolling faster/slower
-            
+
             current_position += scroll_increment
-            
+
             # Get actual scroll position to handle cases where we can't scroll further
             actual_position = browser.execute_script("return window.pageYOffset")
-            
+
             print(f"[+] - 📍 Scrolled to position: {actual_position}px")
-            
+
             # If we haven't moved, we've reached the bottom
             if current_position > scroll_increment and actual_position < current_position - scroll_increment:
                 print("[+] - 🏁 Reached bottom of page")
                 break
-                
+
         except Exception as e:
             print(f"[+] - ⚠️ Error during scroll: {e}")
             break
-    
+
     # Pause at the bottom
     print("[+] - ⏸️ Pausing at bottom for 3 seconds...")
     time.sleep(3)
-    
+
     # Scroll back to top slowly
     print("[+] - ⬆️ Scrolling back to top...")
     while current_position > 0:
@@ -951,17 +957,17 @@ def scroll_landing_page_slowly():
             current_position -= scroll_increment
             if current_position < 0:
                 current_position = 0
-                
+
             browser.execute_script(f"window.scrollTo(0, {current_position});")
             time.sleep(1)  # Faster scroll back up
-            
+
             actual_position = browser.execute_script("return window.pageYOffset")
             print(f"[+] - 📍 Scrolled back to position: {actual_position}px")
-            
+
         except Exception as e:
             print(f"[+] - ⚠️ Error during scroll back: {e}")
             break
-    
+
     # Final scroll to top
     try:
         browser.execute_script("window.scrollTo(0, 0);")
@@ -969,7 +975,7 @@ def scroll_landing_page_slowly():
         print("[+] - 🔝 Returned to top of page")
     except Exception as e:
         print(f"[+] - ⚠️ Error scrolling to top: {e}")
-    
+
     print("[+] - ✅ Landing page scroll test completed successfully!")
     return True
 
@@ -979,30 +985,30 @@ def show_landing_page():
     """
     print("[+] - 🎯 Running Landing Page Scroll Tests")
     print("=" * 50)
-    
+
     try:
         # Test 1: Basic scroll functionality
         if not scroll_landing_page_slowly():
             print("[+] - ❌ Basic scroll test failed")
             return False
-        
+
         print("\n" + "-" * 50 + "\n")
-        
+
         # Test 2: Element visibility during scroll
         if not test_page_elements_during_scroll():
             print("[+] - ❌ Element visibility test failed")
             return False
-        
+
         print("\n" + "=" * 50)
         print("[+] - 🎉 All tests completed successfully!")
-        
+
         # Keep browser open for a moment
         time.sleep(5)
-        
+
     except Exception as e:
         print(f"[+] - ❌ Unexpected error during tests: {e}")
         return False
-    
+
     # finally:
     #     # Close browser
     #     try:
@@ -1010,7 +1016,7 @@ def show_landing_page():
     #         print("[+] - 🚪 Browser closed")
     #     except:
     #         pass
-    
+
     return True
 
 from test_certificate_service import *
