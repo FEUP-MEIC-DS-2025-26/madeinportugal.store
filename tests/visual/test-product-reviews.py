@@ -12,7 +12,7 @@ import os
 
 
 # urls to use
-host_MIPS_Frontend = 'https://microfrontend-host-1054126107932.europe-west1.run.app'
+host_MIPS_Frontend = 'https://frontend.madeinportugal.store'
 login_page = ''
 federatedLogin = ''
 
@@ -52,7 +52,7 @@ def navigate_host():
     try:
         go_to_host_frontend()
         click_button('Product Reviews Page')
-        select_first_product_prod_reviews()
+        select_product_prod_reviews(3)
         select_first_user_prod_reviews()
         set_rating_prod_reviews()
         write_review_prod_reviews()
@@ -82,43 +82,36 @@ def scroll_up():
     browser.execute_script("window.scrollTo(0, 0);")
     time.sleep(2)
 
-def select_first_product_prod_reviews():
-    print("Selecting product...")
+def select_product_prod_reviews(index=1):
+    print(f"Selecting product #{index}...")
     label_id = "product-select-label"
     wait = WebDriverWait(browser, 6)
+
     try:
         combobox = wait.until(EC.element_to_be_clickable(
             (By.CSS_SELECTOR, f'div[role="combobox"][aria-labelledby="{label_id}"]')
         ))
+
         browser.execute_script("arguments[0].scrollIntoView({block:'center'});", combobox)
         try:
             combobox.click()
-        except Exception:
+        except:
             browser.execute_script("arguments[0].click();", combobox)
 
         option_xpath = (
-            "(//ul[@role='listbox' and .//li[@role='option']])[last()]"
-            "//li[@role='option' and not(contains(@class,'Mui-disabled'))][1]"
+            f"(//ul[@role='listbox' and .//li[@role='option']])[last()]"
+            f"//li[@role='option' and not(contains(@class,'Mui-disabled'))][{index}]"
         )
-        opt = WebDriverWait(browser, 4).until(EC.element_to_be_clickable((By.XPATH, option_xpath)))
+
+        opt = WebDriverWait(browser, 4).until(
+            EC.element_to_be_clickable((By.XPATH, option_xpath))
+        )
         browser.execute_script("arguments[0].click();", opt)
+
         time.sleep(1)
-        print("Selected first product.")
+        print(f"Selected product #{index}.")
     except Exception as e:
-        print("select_first_product_prod_reviews failed:", e)
-        try:
-            lbl_trigger = browser.find_element(By.XPATH, "//label[@id='product-select-label']")
-            alt = lbl_trigger.find_element(By.XPATH, "ancestor::*[contains(@class,'MuiFormControl-root')][1]//div[@role='combobox']")
-            alt.send_keys(Keys.SPACE)
-            opt = WebDriverWait(browser, 3).until(EC.visibility_of_element_located((By.XPATH, "(//ul[@role='listbox'])[last()]//li[1]")))
-            browser.execute_script("arguments[0].click();", opt)
-            time.sleep(1)
-            print("Selected first product (fallback).")
-        except Exception:
-            try:
-                browser.switch_to.active_element.send_keys(Keys.ESCAPE)
-            except Exception:
-                pass
+        print("select_product_prod_reviews failed:", e)
 
 def select_first_user_prod_reviews():
     print("Selecting user...")

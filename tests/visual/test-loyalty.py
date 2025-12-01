@@ -12,7 +12,7 @@ import os
 
 
 # urls to use
-host_MIPS_Frontend = 'https://microfrontend-host-1054126107932.europe-west1.run.app'
+host_MIPS_Frontend = 'https://frontend.madeinportugal.store'
 login_page = ''
 federatedLogin = ''
 
