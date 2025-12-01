@@ -145,6 +145,14 @@ def navigate():
     except Exception as e:
         print(f"Error in wishlist feature: {e}")
     
+    # Chat Support
+    from test_chat_support import navigate_chat_support
+    try:
+        wait = WebDriverWait(browser, 3)
+        navigate_chat_support(browser, wait)
+    except Exception as e:
+        print(f"Error in Chat Support feature: {e}")
+
 
     # quit
     #browser.quit()
