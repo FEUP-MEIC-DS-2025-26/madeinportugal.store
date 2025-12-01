@@ -11,7 +11,7 @@ browser.set_window_position(0, 0)
 browser.set_window_size(1280, 900)
 
 
-def visit_keybind_subpages(keys=('n', 'p', 'o', 'i', 'a')):
+def visit_vendor_dashboard(keys=('n', 'p', 'o', 'i', 'a')):
     browser.get(VENDOR_DASHBOARD_URL)
     time.sleep(1)
     origin = browser.current_url
@@ -176,7 +176,7 @@ def fill_registration():
 
 if __name__ == '__main__':
     try:
-        visit_keybind_subpages()
+        visit_vendor_dashboard()
     finally:
         browser.quit()
 
