@@ -166,10 +166,10 @@ def navigate_host():
     print("Test-leaderboards start:")
     try:
         go_to_host_frontend()
-        #click_button('Product Leaderboards Page') Uncomment when available in host
+        click_button('Product Leaderboards Page')
         scroll_down()
         scroll_up()
-        #switch_leaderboard_category() Uncomment when available in host
+        switch_leaderboard_category()
         go_to_host_frontend()
     except:
         print("Error while testing leaderboards")
@@ -187,6 +187,17 @@ def navigate_host():
         go_to_host_frontend()
     except:
         print("Error while testing reviews")
+
+    # Test loyalty
+    print("Test-loyalty start:")
+    try:
+        go_to_host_frontend()
+        click_button('MIPS Loyalty System')
+        toggle_use_points()
+        click_button("Place Order (Pay €41.00)")
+        go_to_host_frontend()
+    except:
+        print("Error while testing loyalty")
 
     # this is also applicable for a product section, if it exists in the future it should be moved
     print("Test-certicate-management Service")
@@ -787,6 +798,65 @@ def write_review_prod_reviews(text="Good Product!"):
     except Exception as e:
         print("write_review failed:", e)
     time.sleep(3)
+
+# Loyalty-System
+
+def toggle_use_points(use = True):
+    print("Toggling checkbox")
+    try:
+        wait = WebDriverWait(browser, 6)
+        checkbox = wait.until(EC.presence_of_element_located(
+            (By.CSS_SELECTOR, ".points-box .points-check input[type='checkbox']")
+        ))
+    except Exception:
+        try:
+            checkbox = WebDriverWait(browser, 4).until(
+                EC.presence_of_element_located((By.XPATH, "//label[contains(normalize-space(.), 'Use my points')]//input[@type='checkbox']"))
+            )
+        except Exception as e:
+            print("toggle_use_points: checkbox not found:", e)
+            return
+
+    try:
+        current = checkbox.is_selected()
+    except Exception:
+        current = bool(checkbox.get_attribute("checked"))
+
+    if current == use:
+        print(f"toggle_use_points: already {'checked' if use else 'unchecked'}.")
+        return
+
+    try:
+        browser.execute_script("arguments[0].scrollIntoView({block:'center'});", checkbox)
+        try:
+            checkbox.click()
+        except Exception:
+            browser.execute_script("arguments[0].click();", checkbox)
+        time.sleep(1)
+    except Exception as e:
+        print("toggle_use_points: click attempt failed:", e)
+        return
+
+    try:
+        final = checkbox.is_selected()
+    except Exception:
+        final = bool(checkbox.get_attribute("checked"))
+
+    if final != use:
+        print("toggle_use_points: failed to change state (final != desired).")
+        return
+
+    if use:
+        try:
+            WebDriverWait(browser, 3).until(
+                EC.visibility_of_element_located((By.CSS_SELECTOR, ".points-warning, .points-box .points-warning"))
+            )
+        except Exception:
+            print("toggle_use_points: points-warning did not appear (not fatal).")
+
+    print(f"toggle_use_points: checkbox is now {'checked' if final else 'unchecked'}.")
+    time.sleep(2)
+    return
 
 # Generic
 
