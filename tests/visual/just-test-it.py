@@ -264,7 +264,7 @@ def navigate_host():
     try:
         go_to_host_frontend()
         click_button('Product Reviews Page')
-        select_product_prod_reviews(1)
+        select_product_prod_reviews(3)
         select_first_user_prod_reviews()
         set_rating_prod_reviews()
         write_review_prod_reviews()
