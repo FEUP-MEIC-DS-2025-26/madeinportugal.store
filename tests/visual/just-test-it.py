@@ -120,7 +120,6 @@ def navigate():
     except:
         print("Error in spam moderation")
 
-
     #Tracking status
     try:
         test_tracking_status()
@@ -157,10 +156,85 @@ def navigate():
     # quit
     #browser.quit()
 
+def force_click_element(element):
+    browser.execute_script("arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});", element)
+    time.sleep(0.5)
+    browser.execute_script("arguments[0].click();", element)
+
+def find_button_by_scanning(target_text):
+    print(f"[Scan] A varrer a página por botões com texto '{target_text}'...")
+    candidates = browser.find_elements(By.TAG_NAME, "button") + \
+                 browser.find_elements(By.TAG_NAME, "a") + \
+                 browser.find_elements(By.CSS_SELECTOR, "[role='button']")
+    for btn in candidates:
+        try:
+            txt = btn.text or btn.get_attribute("innerText")
+            if txt and target_text in txt:
+                print(f"[Scan] Encontrado! Texto: '{txt}'")
+                return btn
+        except:
+            continue
+    return None
+
+def robust_click(text_to_find, description):
+    print(f"\n[Ação] A tentar clicar em: '{description}'...")
+    wait = WebDriverWait(browser, 10)
+    
+    try:
+        xpath = f"//*[contains(normalize-space(.), '{text_to_find}')]"
+        elements = wait.until(EC.presence_of_all_elements_located((By.XPATH, xpath)))
+        target = elements[-1] 
+        force_click_element(target)
+        print(f"[Sucesso] Clique forçado (XPath) em '{description}'.")
+        return True
+    except Exception:
+        print(f"[XPath] Falhou. A tentar varredura manual...")
+
+    target = find_button_by_scanning(text_to_find)
+    if target:
+        force_click_element(target)
+        print(f"[Sucesso] Clique forçado (Scan) em '{description}'.")
+        return True
+
+    print(f"Não foi possível encontrar/clicar em '{text_to_find}'.")
+    return False
+
+def test_host_product_interaction():
+    print("\n--- INICIANDO TESTE: PRODUCT PAGE FLOW ---")
+    
+    if not robust_click("PRODUCT PAGE CLASS 2 GROUP 2", "Botão Menu Produto"):
+        print("Falha crítica: Não consegui entrar na página.")
+        return
+
+    print("A aguardar carregamento da página de produto...")
+    wait = WebDriverWait(browser, 15)
+    try:
+        title = wait.until(EC.visibility_of_element_located((By.TAG_NAME, "h1")))
+        print(f"Página carregada! Produto: {title.text}")
+        
+        browser.execute_script("window.scrollTo(0, 300);")
+        time.sleep(2)
+
+        robust_click("COMPRAR", "Botão Comprar")
+        
+        time.sleep(2)
+        print("Voltando ao menu do Host...")
+        browser.back() 
+        time.sleep(3) 
+
+    except Exception as e:
+        print(f"Erro na interação com o produto: {e}")
+
 def navigate_host():
     # let's do the login
     browser.get(host_MIPS_Frontend)
     authenticate_host()
+
+    # Test product page
+    try:
+        test_host_product_interaction()
+    except Exception as e:
+        print(f"Erro no teste Product Page: {e}")
 
     # Test leaderboards
     print("Test-leaderboards start:")
