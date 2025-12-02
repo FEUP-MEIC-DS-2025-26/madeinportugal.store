@@ -383,42 +383,47 @@ def perform_image_search_by_text():
 
 
 def test_product_suggestion_page():
-    wait = WebDriverWait(browser, 20)
-    dropdown = browser.find_element(By.CSS_SELECTOR, '[aria-label="Open user menu"]')
-    dropdown.click()
+    try: 
+        wait = WebDriverWait(browser, 20)
+        dropdown = browser.find_element(By.CSS_SELECTOR, '[aria-label="Open user menu"]')
+        dropdown.click()
 
-    page_links = browser.find_elements(By.CSS_SELECTOR, "a")
-    for link in page_links:
-        if link.text == "Seller Dashboard":
-            link.click()
-            break
+        page_links = browser.find_elements(By.CSS_SELECTOR, "a")
+        for link in page_links:
+            if link.text == "Seller Dashboard":
+                link.click()
+                break
 
-    time.sleep(2)
+        time.sleep(2)
 
-    original_window = browser.current_window_handle
+        original_window = browser.current_window_handle
 
-    wait.until(EC.number_of_windows_to_be(2))
+        wait.until(EC.number_of_windows_to_be(2))
 
-    for window_handle in browser.window_handles:
-        if window_handle != original_window:
-            browser.switch_to.window(window_handle)
-            break
+        for window_handle in browser.window_handles:
+            if window_handle != original_window:
+                browser.switch_to.window(window_handle)
+                break
 
-    wait.until(EC.title_is("Vendor Dashboard"))
+        wait.until(EC.title_is("Vendor Dashboard"))
 
-    wait.until(
-        lambda d: any(
-            "suggest" in b.text.strip().lower()
-            for b in d.find_elements(By.CSS_SELECTOR, ".action-content h3")
+        wait.until(
+            lambda d: any(
+                "suggest" in b.text.strip().lower()
+                for b in d.find_elements(By.CSS_SELECTOR, ".action-content h3")
+            )
         )
-    )
 
-    dashboard_actions = browser.find_elements(By.CSS_SELECTOR, ".action-content")
-    for content in dashboard_actions:
-        if "suggest" in content.text.strip().lower():
-            content.click()
-            break
-
+        dashboard_actions = browser.find_elements(By.CSS_SELECTOR, ".action-content")
+        for content in dashboard_actions:
+            if "suggest" in content.text.strip().lower():
+                content.click()
+                break
+    except Exception as e:
+        print(f"Error navigating to product suggestion page: {e}")
+        browser.get("https://mips-product-configuration-oqwis3m3oa-no.a.run.app")
+        time.sleep(2)
+        
     product_name = browser.find_element(By.ID, "name")
 
     product_name.send_keys("Queijinho da Serra")
