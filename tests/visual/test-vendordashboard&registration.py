@@ -2,101 +2,58 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 import time
+import traceback
 
 # Send keybinds N,P,O,I,A and visit the resulting subpages, then return
-VENDOR_DASHBOARD_URL = "https://vendor-frontend-786191016787.europe-west1.run.app/dashboard"
+VENDOR_DASHBOARD_URL = "https://microfrontend-host-1054126107932.europe-west1.run.app/vendor/dashboard"
+REGISTER_URL = "https://microfrontend-host-1054126107932.europe-west1.run.app/vendor/registration"
 
 browser = webdriver.Chrome()
 browser.set_window_position(0, 0)
 browser.set_window_size(1280, 900)
 
 
+def scroll_full_page(duration=2.0, steps=10):
+    """Scroll down the page in steps over `duration` seconds so a human can see content."""
+    try:
+        height = browser.execute_script("return document.body.scrollHeight") or 0
+        if not height:
+            return
+        for i in range(steps):
+            y = int(height * (i + 1) / steps)
+            browser.execute_script("window.scrollTo(0, arguments[0]);", y)
+            time.sleep(max(0.01, duration / steps))
+        # pause at bottom briefly
+        time.sleep(0.3)
+        # scroll back to top so subsequent screenshots/navigation start at top
+        browser.execute_script("window.scrollTo(0, 0);")
+    except Exception:
+        pass
+
+
 def visit_vendor_dashboard(keys=('n', 'p', 'o', 'i', 'a')):
     browser.get(VENDOR_DASHBOARD_URL)
-    time.sleep(1)
+    time.sleep(2)
+    # scroll so a user can see the whole page briefly
+    scroll_full_page(duration=2.0, steps=12)
     origin = browser.current_url
     print('Opened dashboard:', origin)
-
-    # ensure a body element exists
-    try:
-        body = browser.find_element(By.TAG_NAME, 'body')
-    except Exception:
-        body = None
-
-    for k in keys:
-        try:
-            if body:
-                body.send_keys(k)
-            else:
-                # fallback: send via execute_script
-                browser.execute_script("document.body.dispatchEvent(new KeyboardEvent('keydown',{key: arguments[0]}));", k)
-        except Exception:
-            try:
-                browser.execute_script("document.body.dispatchEvent(new KeyboardEvent('keydown',{key: arguments[0]}));", k)
-            except Exception:
-                pass
-
-        # wait briefly for navigation or new tab
-        time.sleep(1)
-
-        handled = False
-        # if a new tab opened, switch to it, log, close it, return to origin
-        if len(browser.window_handles) > 1:
-            orig_handle = browser.current_window_handle
-            for h in browser.window_handles:
-                if h != orig_handle:
-                    browser.switch_to.window(h)
-                    time.sleep(0.7)
-                    print(f"Key '{k}' opened new tab: {browser.current_url}")
-                    # If this is the registration flow (n), try filling the form
-                    if k.lower() == 'n':
-                        try:
-                            fill_registration()
-                        except Exception as e:
-                            print('Registration fill error on new tab:', e)
-                        time.sleep(0.5)
-                    try:
-                        browser.close()
-                    except Exception:
-                        pass
-                    browser.switch_to.window(orig_handle)
-                    handled = True
-                    break
-
-        # if same-tab navigation occurred
-        if not handled:
-            try:
-                cur = browser.current_url
-                if cur != origin:
-                    print(f"Key '{k}' navigated to: {cur}")
-                    # if this is registration, try filling before going back
-                    if k.lower() == 'n':
-                        try:
-                            fill_registration()
-                        except Exception as e:
-                            print('Registration fill error on same tab:', e)
-                        time.sleep(0.5)
-                    # go back to origin
-                    try:
-                        browser.back()
-                        time.sleep(0.5)
-                        print(f"Returned from key '{k}'")
-                    except Exception:
-                        pass
-                    handled = True
-                else:
-                    print(f"Key '{k}' did not navigate")
-            except Exception:
-                print(f"Key '{k}' handling error")
-
-        # brief pause between keys
-        time.sleep(0.5)
+    time.sleep(2)
 
 
 def fill_registration():
-    """Attempt to fill a visible registration form on the current page and submit."""
+    """Open the dedicated registration page (`REGISTER_URL`), then fill and submit its form."""
+    print('Opening registration page:', REGISTER_URL)
+    try:
+        browser.get(REGISTER_URL)
+        time.sleep(2)
+        scroll_full_page(duration=2.0, steps=12)
+    except Exception as e:
+        print('Error navigating to REGISTER_URL:', e)
+        return
+
     print('Attempting to fill registration form...')
-    time.sleep(0.5)
+    time.sleep(2)
     try:
         # prefer a register-form if present
         try:
@@ -117,6 +74,7 @@ def fill_registration():
         }
 
         for key, val in values.items():
+            print(f"Filling field '{key}' with value '{val}'...")
             try:
                 el = form.find_element(By.NAME, key)
                 tag = el.tag_name.lower()
@@ -131,6 +89,7 @@ def fill_registration():
                 else:
                     el.clear()
                     el.send_keys(val)
+                time.sleep(0.5)
             except Exception:
                 try:
                     el = form.find_element(By.ID, key)
@@ -155,6 +114,7 @@ def fill_registration():
                     ta.send_keys(answer)
                 except Exception:
                     pass
+                time.sleep(0.5)
         except Exception:
             pass
 
@@ -165,7 +125,7 @@ def fill_registration():
                 submit.click()
             except Exception:
                 browser.execute_script('arguments[0].click();', submit)
-            time.sleep(1)
+            time.sleep(6)
             print('Submitted registration form (attempted)')
         except Exception:
             print('No submit button found')
@@ -177,6 +137,7 @@ def fill_registration():
 if __name__ == '__main__':
     try:
         visit_vendor_dashboard()
+        fill_registration()
     finally:
         browser.quit()
 
