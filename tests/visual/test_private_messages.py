@@ -5,14 +5,6 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
 
-landing_page = "https://madeinportugal.store"
-username = "user"
-password = "pass"
-
-browser = webdriver.Chrome()
-browser.set_window_size(1280, 960)
-
-wait = WebDriverWait(browser, 10)
 
 melancholic_messages = [
     "Há dias em que o peso da tua ausência é tão grande que até o ar parece desistir de entrar.",
@@ -37,34 +29,14 @@ melancholic_messages = [
     "Mesmo quando tento não pensar, a tua ausência encontra forma de se infiltrar no meu dia."
 ]
 
-def login():
-    browser.get(landing_page)
-    wait = WebDriverWait(browser, 20)
-
-    login_btn = wait.until(EC.element_to_be_clickable(
-        (By.XPATH, "//button[contains(text(),'Login')]")
-    ))
-    browser.execute_script("arguments[0].click();", login_btn)
-
-    user_input = wait.until(EC.presence_of_element_located((By.XPATH, "//form//input[1]")))
-    pass_input = wait.until(EC.presence_of_element_located((By.XPATH, "//form//input[2]")))
-
-    user_input.send_keys(username)
-    pass_input.send_keys(password)
-
-    submit_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//form//button[@type='submit']")))
-    browser.execute_script("arguments[0].click();", submit_btn)
-
-    time.sleep(2)
-
-def go_to_my_conversations():
-    menu_btn = wait.until(
+def go_to_my_conversations(browser):
+    menu_btn = WebDriverWait(browser, 10).until(
         EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Open user menu']"))
     )
     menu_btn.click()
     time.sleep(2)
 
-    conversations_link = wait.until(
+    conversations_link = WebDriverWait(browser, 10).until(
         EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'My Conversations')]"))
     )
     conversations_link.click()
@@ -73,7 +45,7 @@ def go_to_my_conversations():
     browser.switch_to.window(browser.window_handles[-1])
     time.sleep(2)
 
-def open_chat():
+def open_chat(browser):
     conversation_item = WebDriverWait(browser, 10).until(
         EC.element_to_be_clickable(
             (By.XPATH, "//div[contains(@class,'MuiListItemButton-root')][.//strong[text()='Jane Doe']]")
@@ -83,8 +55,8 @@ def open_chat():
     conversation_item.click()
     time.sleep(2)
 
-def send_message():
-    msg_box = wait.until(
+def send_message(browser):
+    msg_box = WebDriverWait(browser, 10).until(
         EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Type your message here']"))
     )
 
@@ -97,15 +69,22 @@ def send_message():
     )
 
     send_btn.click()
-    time.sleep(1)
-
-def main():
     time.sleep(5)
-    login()
-    go_to_my_conversations()
-    open_chat()
-    send_message()
-    time.sleep(20)
-    browser.quit()
 
-main()
+    current_tab = browser.current_window_handle
+    all_tabs = browser.window_handles
+
+    if len(all_tabs) > 1:
+        for tab in all_tabs:
+            if tab != current_tab:
+                previous_tab = tab
+                break
+
+        browser.close()
+        browser.switch_to.window(previous_tab)
+
+
+def navigate_private_messages(browser):
+    go_to_my_conversations(browser)
+    open_chat(browser)
+    send_message(browser)

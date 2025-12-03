@@ -80,7 +80,6 @@ def authenticate_host():
     time.sleep(5)
 
 def navigate():
-    # let's do the login
     browser.get(landing_page)
     authenticate()
 
@@ -96,6 +95,14 @@ def navigate():
         time.sleep(5)
     except:
         print("Error in image search")
+
+    import test_private_messages
+    try:
+        go_to_landing_page()
+        test_private_messages.navigate_private_messages(browser)
+        go_to_landing_page()
+    except Exception as e:
+        print("Error in private messages:", e)
 
     try:
         # Suggest a product and inventory accept
@@ -1141,7 +1148,7 @@ def test_certificate_service():
     run_certificate_demo(browser)
 
 
-show_landing_page()
+# show_landing_page()
 
 navigate()
 
