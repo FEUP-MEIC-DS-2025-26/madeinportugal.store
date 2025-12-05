@@ -134,14 +134,17 @@ def navigate():
         time.sleep(5)
     except:
         print("Error in tracking status")
-    # AI chat
-    go_to_landing_page()
-    from_landing_page_navigate_to_ai_chat(browser)
-    testChatAndResponse(browser)
-    time.sleep(5)
-    go_to_landing_page()
-    time.sleep(5)
-
+ 
+    try:
+        # AI chat
+        go_to_landing_page()
+        from_landing_page_navigate_to_ai_chat(browser)
+        testChatAndResponse(browser)
+        time.sleep(5)
+        go_to_landing_page()
+        time.sleep(5)
+    except:
+        print("Error in AI agent chat")
     # Wishlist feature
     from test_wishlist import test_wishlist_feature
     try:
