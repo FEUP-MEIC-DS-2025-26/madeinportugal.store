@@ -158,6 +158,7 @@ def navigate():
     from test_chat_support import navigate_chat_support
     try:
         wait = WebDriverWait(browser, 3)
+        go_to_landing_page()
         navigate_chat_support(browser, wait)
     except Exception as e:
         print(f"Error in Chat Support feature: {e}")
