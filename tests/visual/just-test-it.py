@@ -119,6 +119,15 @@ def navigate():
     except:
         print("Error in inventory dashboard or product suggestion")
 
+    # Product Listing Tests
+    from test_product_listing import run_product_listing_test
+    try:
+        run_product_listing_test(browser)
+        go_to_landing_page()
+        time.sleep(5)
+    except Exception as e:
+        print(f"Error in testing product listing: {e}")
+
     # Spam Moderation flow
     try:
         run_moderator_flow()
