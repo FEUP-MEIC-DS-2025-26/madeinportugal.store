@@ -296,6 +296,23 @@ def navigate_host():
     except:
         print("Error while testing reviews")
 
+    # Test product recommendations    
+    try:
+        go_to_host_frontend()
+        scroll_25_pct_down()
+        click_button('MIPS Recommendations Landing Page Section')
+        scroll_up()
+        check_recommended_products()
+        click_recommended_reason()
+        click_recommendations_seemore()
+        
+        go_to_host_frontend()
+        click_button("MIPS Recommendations Page")
+        time.sleep(5)
+        go_to_host_frontend()
+    except:
+        print("Error while testing recommendations")
+
     # Test loyalty
     print("Test-loyalty start:")
     try:
@@ -1225,6 +1242,45 @@ def write_review_prod_reviews(text="Good Product!"):
         print("write_review failed:", e)
     time.sleep(3)
 
+# Product Recommendations
+
+def check_recommended_products():
+    next_button = browser.find_element(By.XPATH, "//*[@id='rec-carousel-arrow-right']")
+    for _ in range(5):
+        next_button.click()
+        time.sleep(1)
+    time.sleep(2)
+    
+def click_recommended_reason():
+    rec_reason_button = browser.find_element(
+        By.XPATH, 
+        "//*[@id='rec-carousel-frame']/*[4]//*[@id='rec-reason-icon']"
+    )
+    rec_reason_button.click()
+    time.sleep(5)
+
+def click_recommendations_seemore():
+    seemore_button = browser.find_element(By.XPATH, "//*[@id='rec-see-more-button']")
+    seemore_button.click()
+    time.sleep(5)
+    
+    browser.execute_script(
+        "window.scrollTo(0, document.body.scrollHeight);"
+    )
+    
+    time.sleep(10)
+
+    seemore_button = browser.find_element(By.XPATH, "//*[@id='rec-see-more-button']")
+    seemore_button.click()
+    time.sleep(10)
+    
+    browser.execute_script(
+        "window.scrollTo(0, document.body.scrollHeight);"
+    )
+    
+    time.sleep(10)
+
+
 # Loyalty-System
 
 def toggle_use_points(use = True):
@@ -1298,6 +1354,12 @@ def scroll_down():
     print("Scrolling down...")
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(2)
+
+def scroll_25_pct_down():
+    print("Scrolling to middle...")
+    browser.execute_script("window.scrollTo(0, document.body.scrollHeight / 4);")
+    time.sleep(2)
+
 
 def scroll_up():
     print("Scrolling up...")
